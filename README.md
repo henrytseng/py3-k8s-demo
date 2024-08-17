@@ -275,3 +275,31 @@ kubectl delete pod redis-client
 
 Service's `type` must be `type: LoadBalancer`
 
+### What should I be looking for in OOMKilled
+
+Depending on your set up it could have happened very quickly
+
+```
+kubectl describe pod sample-app-deployment-56f5467dc-rrxtc
+
+...
+
+State:          Running
+      Started:      Fri, 16 Aug 2024 22:56:37 -0400
+    Last State:     Terminated
+      Reason:       OOMKilled
+      Exit Code:    137
+      Started:      Fri, 16 Aug 2024 22:55:11 -0400
+      Finished:     Fri, 16 Aug 2024 22:56:36 -0400
+    Ready:          True
+```
+
+And
+
+```
+kubectl get pods
+
+...
+
+sample-app-deployment-56f5467dc-rrxtc   1/1     Running   1 (109s ago)   3m15s
+```
