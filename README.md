@@ -6,6 +6,8 @@ Add to the hello world application.
 
 https://fastapi.tiangolo.com/#create-it
 
+Bonus points if you add an NGINX sidecar and serve up a frontend.  
+
 
 ## Build
 
