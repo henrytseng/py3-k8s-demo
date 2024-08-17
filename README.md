@@ -67,7 +67,7 @@ curl http://localhost:8000
 
 Then modify the application, build it with a new image and tag (not `sample_app:v1`) and run the container again.
 
-Use the running container to execute a command try.  Find the container
+Use the running container to execute a command.  Find the container
 
 ```bash
 docker ps
@@ -96,7 +96,7 @@ Open up Docker Desktop settings and "Enable Kubernetes"
 
 Make sure you have the `kubectl` command if it wasn't installed with Docker Desktop use `brew install kubectl`
 
-If you are using Mac OSX Docker Desktop will menu with "Kubernetes Context"
+If you are using Mac OSX Docker Desktop will include a menu with "Kubernetes Context"
 
 Check your local context, open up a terminal window and try
 
