@@ -166,6 +166,12 @@ Confirm that your pods are running and no restarts are happening.
 
 Add an endpoint to `app.py` and write a method that will consume more memory than you have.  Deploy the new change.
 
+If everything looks good continue but if you don't see the endpoint, did you remember to build a new image and to change `deployment.yaml`?  Check the manifest is correct
+
+```bash
+kubectl get deployments sample-app-deployment -o yaml
+```
+
 Hop on one of the pods and monitor the resources
 
 ```bash
@@ -178,8 +184,87 @@ Trigger the issue, you might not hit the pod you are monitoring until you try a 
 curl http://localhost:8000/name-of-problematic-endpoint
 ```
 
+Shut down your cluster
+
+```
+kubectl delete -f manifests
+```
 
 
+
+## Helm Charts
+
+Helm charts are the "package manager" for infrastructure pre-packages for you.  That is, since many of them are running in production they follow best practices for setting up all kinds of services.
+
+Bitnami Redis chart
+
+(https://github.com/bitnami/charts/tree/main/bitnami/redis)[https://github.com/bitnami/charts/tree/main/bitnami/redis]
+
+Install Redis as a Helm chart
+
+```bash
+helm install redis-sample oci://registry-1.docker.io/bitnamicharts/redis
+```
+
+You should see pods for Redis come up
+
+Follow their instructions to connect as a client using `redis-cli`
+
+```
+To get your password run:
+
+    export REDIS_PASSWORD=$(kubectl get secret --namespace default redis -o jsonpath="{.data.redis-password}" | base64 -d)
+
+To connect to your Redis&reg; server:
+
+1. Run a Redis&reg; pod that you can use as a client:
+
+   kubectl run --namespace default redis-client --restart='Never'  --env REDIS_PASSWORD=$REDIS_PASSWORD  --image docker.io/bitnami/redis:7.4.0-debian-12-r1 --command -- sleep infinity
+
+   Use the following command to attach to the pod:
+
+   kubectl exec --tty -i redis-client \
+   --namespace default -- bash
+
+2. Connect using the Redis&reg; CLI:
+   REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli -h redis-master
+   REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli -h redis-replicas
+
+To connect to your database from outside the cluster execute the following commands:
+
+    kubectl port-forward --namespace default svc/redis-master 6379:6379 &
+    REDISCLI_AUTH="$REDIS_PASSWORD" redis-cli -h 127.0.0.1 -p 6379
+```
+
+Forward ports to connect
+
+```
+kubectl port-forward --namespace default svc/redis-master 6379:6379
+```
+
+Redis is a key-value pair database with O(1) complexity access.
+
+Try a few examples.  This would be a naive chat room application:
+
+1. Write a key-value
+
+```
+> set sampleapp:notification:message:room:1:message:123 "Hello world"
+> set sampleapp:notification:message:room:1:message:124 "Lorem ipsum"
+```
+
+2. Get values from a set of keys
+
+```
+> keys sampleapp:notification:message:room:1:message:*
+```
+
+Uninstall the Helm chart and remove the pod you were using as a client
+
+```
+helm uninstall redis
+kubectl delete pod redis-client
+```
 
 
 ## FAQ
