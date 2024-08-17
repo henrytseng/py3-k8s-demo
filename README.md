@@ -83,11 +83,10 @@ Inside the container try something, like kill the fastapi process
 kill 1
 ```
 
-Shutdown the docker application `ctrl-c` or use `docker stop {container_id}` before trying the Kubernetes deployment
+Is it still running?
 
 
-
-## Run Kubernetes Deployment
+## Deploy to Kubernetes
 
 ### Connect to the cluster
 
@@ -110,23 +109,23 @@ You should see a star next to `docker-desktop`
 
 Add `watch` with `brew install watch`
 
-Look for running pods
+Open up a new terminal and check for running pods with
 
 ```bash
-kubectl get pods
+watch kubectl get pods
 ```
 
 Open up the `manifests/deployments.yaml`
 
 Does that manifest look right to you?
 
-Apply the configuration, or deploy the manifests, to your cluster.
+Once you've entered in the image and tag apply the configuration, deploy to the cluster:
 
 ```bash
 kubectl apply -f manifests
 ```
 
-You should see the application spin up.
+You should see pods spin up the application
 
 What port is the service running on?
 
@@ -135,6 +134,51 @@ List the services and find out the name and port it is running on
 ```bash
 kubectl get services
 ```
+
+Find out more about the deployment
+
+```
+kubectl describe sample-app-deployment
+```
+
+Find out about the pods
+
+```
+kubectl describe ${name_of_a_pod}
+```
+
+
+### Simulate OOMKilled
+
+Kubernetes will automatically deploy with a round-robin blue-green deployment and attempt to keep a service running by managing resources, e.g. - setup new nodes if configured and allocate resources to pods deploying them.
+
+In this next part we'll simulate an outage caused by OOMKilled - out of memory, an event where a process is killed by the kernel for utilizing too much memory and not releasing it.
+
+Change the deployment resources to 1Mi and add replicas 3 - 10.
+
+Apply your changes
+
+```
+kubectl apply -f manifests
+```
+
+Confirm that your pods are running and no restarts are happening.
+
+Add an endpoint to `app.py` and write a method that will consume more memory than you have.  Deploy the new change.
+
+Hop on one of the pods and monitor the resources
+
+```bash
+kubectl exec -it ${name_of_a_pod} top
+```
+
+Trigger the issue, you might not hit the pod you are monitoring until you try a few times.
+
+```bash
+curl http://localhost:8000/name-of-problematic-endpoint
+```
+
+
 
 
 
