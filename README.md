@@ -76,7 +76,7 @@ docker ps
 Hop into the container
 
 ```bash
-docker exec ${container_id}
+docker exec -it ${container_id} /bin/sh
 ```
 
 Inside the container try something, like kill the fastapi process
